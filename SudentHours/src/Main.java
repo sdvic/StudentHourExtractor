@@ -1,12 +1,14 @@
-/*********************************************************************
+/****************************************************************************************
  * Application to extract Student hours by name from Quick Books Invoice dump
- * Vic Wintriss version 140811B Getting hours...looking good
- *********************************************************************/
+ * Vic Wintriss version 140812A Formatting...errors on second appearance of student name
+ ****************************************************************************************/
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -58,7 +60,6 @@ public class Main
 
 		for (StudentHourRecord sr : studentHourRecordList)
 		{
-			 System.out.print(sr.getStudentName() + "\t\t\t\t\t");
 			 if (sr.getHours() == 37.5)
 			 {
 			 sr.setHours(1);
@@ -81,7 +82,9 @@ public class Main
 				studentHourRecord = studentHourRecordList.get(i);
 				studentHours = studentHourRecord.getHours();
 				studentName = studentHourRecord.getStudentName();
-				System.out.println(studentName + " \t\t\t\t\t " + accumulateStudentHours(studentName, studentHours));
+				System.out.format("%-25s", studentName);// + " %20d " + accumulateStudentHours(studentName, studentHours));
+				System.out.format("%.1f", accumulateStudentHours(studentName,  studentHours));
+				System.out.println();
 			}
 	}
 	
@@ -101,7 +104,7 @@ public class Main
 	}
 }
 
-// http://viralpatel.net/blogs/java-read-write-excel-file-apache-poi/
+// http://viralpatel.net/blogs/java-read-write-excel-file-apache-poi/      System.out.format("%4d", i); 
 // cell.setCellType(Cell.CELL_TYPE_STRING);
 // Cell mycell = myrow.createCell(0);
 //
