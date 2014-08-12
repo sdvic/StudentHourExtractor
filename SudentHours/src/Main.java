@@ -1,6 +1,6 @@
 /*********************************************************************
  * Application to extract Student hours by name from Quick Books Invoice dump
- * Vic Wintriss version 140811A
+ * Vic Wintriss version 140811B Getting hours...looking good
  *********************************************************************/
 
 import java.io.File;
@@ -15,7 +15,11 @@ import org.apache.poi.ss.usermodel.Row;
 public class Main
 {
 	public StudentHourRecord studentHourRecord;
-
+	private ArrayList<String> studentNameList = new ArrayList<String>();
+	private ArrayList<StudentHourRecord> studentHourRecordList = new ArrayList<StudentHourRecord>();
+	String studentName = "";
+	double studentHours = 0;
+	
 	public static void main(String[] args) throws IOException
 	{
 		new Main().getGoing();
@@ -23,10 +27,6 @@ public class Main
 
 	private void getGoing() throws IOException
 	{
-		String studentName = "";
-		double studentHours = 0;
-		ArrayList<String> studentNameList = new ArrayList<String>();
-		ArrayList<StudentHourRecord> studentHourRecordList = new ArrayList<StudentHourRecord>();
 		int nameCell = 5;// column 5 Name
 		int priceCell = 7;// column 7 SalesPrice
 		FileInputStream file = new FileInputStream(new File(
@@ -58,24 +58,46 @@ public class Main
 
 		for (StudentHourRecord sr : studentHourRecordList)
 		{
-			System.out.print(sr.getStudentName() + "\t\t\t\t\t");
-			if (sr.getHours() == 37.5)
+			 System.out.print(sr.getStudentName() + "\t\t\t\t\t");
+			 if (sr.getHours() == 37.5)
+			 {
+			 sr.setHours(1);
+			 }
+			 if (sr.getHours() == 60.0)
+			 {
+			 sr.setHours(1.5);
+			 }
+			 if (sr.getHours() == 75.0)
+			 {
+			 sr.setHours(2);
+			 }
+			 if (sr.getHours() == 350.0)
+			 {
+			 sr.setHours(10);
+			 }
+		}
+			for (int i = 0; i < studentHourRecordList.size(); i++)
 			{
-				System.out.println(1);
+				studentHourRecord = studentHourRecordList.get(i);
+				studentHours = studentHourRecord.getHours();
+				studentName = studentHourRecord.getStudentName();
+				System.out.println(studentName + " \t\t\t\t\t " + accumulateStudentHours(studentName, studentHours));
 			}
-			if (sr.getHours() == 60.0)
+	}
+	
+	public double accumulateStudentHours(String studentNameToCheck, double studentHours)
+	{
+		this.studentHours = studentHours;
+		studentName = studentNameToCheck;
+		for (int i = 0; i < studentHourRecordList.size(); i++)
+		{
+			if (studentName.equals(studentHourRecordList.get(i).getStudentName()))
 			{
-				System.out.println(1.5);
-			}
-			if (sr.getHours() == 75.0)
-			{
-				System.out.println(2);
-			}
-			if (sr.getHours() == 350.0)
-			{
-				System.out.println(10);
+				studentHours += studentHourRecordList.get(i).getHours();
+				studentHourRecordList.remove(i);
 			}
 		}
+		return studentHours;
 	}
 }
 
