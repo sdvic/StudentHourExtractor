@@ -2,16 +2,16 @@
 public class StudentHourRecord
 {
 	private String studentName;
-	private double hours;
 	private boolean processed;
+	private double classLength;
 
-	public StudentHourRecord(String studentName, double doublePrice, boolean processed)
+	public StudentHourRecord(String studentName, double classLength, boolean processed)
 	{
 		if (!studentName.equals("Name"));
 		{
 			this.studentName = studentName;
-			this.hours = doublePrice;
 			this.processed = processed;
+			this.setClassLength(classLength);
 		}
 		
 	}
@@ -25,15 +25,6 @@ public class StudentHourRecord
 		this.studentName = studentName;
 	}
 
-	public double getHours()
-	{
-		return hours;
-	}
-
-	public void setHours(double hours)
-	{
-		this.hours = hours;
-	}
 	public boolean isProcessed()
 	{
 		return processed;
@@ -41,5 +32,13 @@ public class StudentHourRecord
 	public void setProcessed(boolean processed)
 	{
 		this.processed = processed;
+	}
+	public double getClassLength()
+	{
+		return classLength;
+	}
+	public void setClassLength(double classLength)
+	{
+		this.classLength = classLength;
 	}
 }
