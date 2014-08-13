@@ -1,6 +1,6 @@
 /****************************************************************************************
  * Application to extract Student hours by name from Quick Books Invoice dump
- * Vic Wintriss version 140812A Formatting...errors on second appearance of student name
+ * Vic Wintriss version 140812B Changed processing arrays...seems better
  ****************************************************************************************/
 
 import java.io.File;
@@ -19,8 +19,9 @@ public class Main
 	public StudentHourRecord studentHourRecord;
 	private ArrayList<String> studentNameList = new ArrayList<String>();
 	private ArrayList<StudentHourRecord> studentHourRecordList = new ArrayList<StudentHourRecord>();
-	String studentName = "";
-	double studentHours = 0;
+	private String studentName = "";
+	private double studentHours = 0;
+	private String stringPrice;
 	
 	public static void main(String[] args) throws IOException
 	{
@@ -43,7 +44,8 @@ public class Main
 			Cell price = row.getCell(priceCell);
 			if (name != null && price != null)
 			{
-				String stringPrice = price.toString();
+				
+				stringPrice = price.toString();
 				studentName = name.getStringCellValue();
 				if (!studentName.equals("Name")
 						|| !stringPrice.equals("Sales Price"))
@@ -52,12 +54,11 @@ public class Main
 					if (doublePrice > 0)
 					{
 						studentHourRecordList.add(new StudentHourRecord(
-								studentName, doublePrice));
+								studentName, doublePrice, false));
 					}
 				}
 			}
 		}
-
 		for (StudentHourRecord sr : studentHourRecordList)
 		{
 			 if (sr.getHours() == 37.5)
@@ -79,12 +80,17 @@ public class Main
 		}
 			for (int i = 0; i < studentHourRecordList.size(); i++)
 			{
-				studentHourRecord = studentHourRecordList.get(i);
-				studentHours = studentHourRecord.getHours();
-				studentName = studentHourRecord.getStudentName();
-				System.out.format("%-25s", studentName);// + " %20d " + accumulateStudentHours(studentName, studentHours));
-				System.out.format("%.1f", accumulateStudentHours(studentName,  studentHours));
-				System.out.println();
+				if(!studentHourRecordList.get(i).isProcessed())
+				{
+					studentHourRecord = studentHourRecordList.get(i);
+					studentHours = studentHourRecord.getHours();
+					studentName = studentHourRecord.getStudentName();
+					studentHourRecordList.get(i).setProcessed(true);
+					System.out.format("%-25s", studentName);
+					double testDouble = accumulateStudentHours(studentName,  studentHours);
+					System.out.format("%.1f", testDouble);
+					System.out.println();
+				}
 			}
 	}
 	
@@ -94,10 +100,10 @@ public class Main
 		studentName = studentNameToCheck;
 		for (int i = 0; i < studentHourRecordList.size(); i++)
 		{
-			if (studentName.equals(studentHourRecordList.get(i).getStudentName()))
+			if (studentName.equals(studentHourRecordList.get(i).getStudentName()) && !studentHourRecordList.get(i).isProcessed())
 			{
 				studentHours += studentHourRecordList.get(i).getHours();
-				studentHourRecordList.remove(i);
+				studentHourRecordList.get(i).setProcessed(true);
 			}
 		}
 		return studentHours;
@@ -105,14 +111,3 @@ public class Main
 }
 
 // http://viralpatel.net/blogs/java-read-write-excel-file-apache-poi/      System.out.format("%4d", i); 
-// cell.setCellType(Cell.CELL_TYPE_STRING);
-// Cell mycell = myrow.createCell(0);
-//
-// //Make it numeric by default.
-// int cellType = Cell.CELL_TYPE_NUMERIC;
-//
-// if (someCondition) {
-// cellType = Cell.CELL_TYPE_STRING;
-// }
-//
-// mycell.setCellType(cellType);
