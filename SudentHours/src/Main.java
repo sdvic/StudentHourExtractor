@@ -1,6 +1,6 @@
 /****************************************************************************************
  * Application to extract Student hours by name from Quick Books Invoice dump
- * Vic Wintriss version 140813A Now getting class length from memo column
+ * Vic Wintriss version 140821A Trying to change to Erik's sort
  ****************************************************************************************/
 
 import java.io.File;
