@@ -7,6 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -14,8 +18,8 @@ import org.apache.poi.ss.usermodel.Row;
 
 public class Main
 {
-	public StudentHourRecord studentHourRecord;
-	private ArrayList<StudentHourRecord> studentHourRecordList = new ArrayList<StudentHourRecord>();
+	public Student student;
+	private List<Student> students = new ArrayList<Student>();
 	private String studentName = "";
 	private Cell memo;
 	private double classHours;
@@ -35,7 +39,7 @@ public class Main
 	private void getGoing() throws IOException
 	{
 		file = new FileInputStream(new File(
-				"/Users/VicMini/-WTS/StudentRecords/July2014StudentHours.xls"));
+				"/Users/VicMini/git/StudentHour/SudentHours/src/July2014StudentHours.xls"));
 		workbook = new HSSFWorkbook(file);
 		sheet = workbook.getSheetAt(0);
 		for (Row row : sheet)
@@ -65,51 +69,22 @@ public class Main
 			if (name != null)
 			{
 				studentName = name.getStringCellValue();
-
 				if (!studentName.equals("Name"))
 				{
-					if (classHours > 0)
-					{
-						studentHourRecordList.add(new StudentHourRecord(
-								studentName, classHours, false));
-					}
+					students.add(new Student(studentName, classHours));
 				}
 			}
-			classHours = 0;
 		}
-		for (int i = 0; i < studentHourRecordList.size(); i++)
-		{
-			if (!studentHourRecordList.get(i).isProcessed())
-			{
-				studentHourRecord = studentHourRecordList.get(i);
-				studentName = studentHourRecord.getStudentName();
-				studentHourRecordList.get(i).setProcessed(true);
-				classHours = studentHourRecord.getClassLength();
-				System.out.format("%-25s", studentName);
-				double testDouble = accumulateStudentHours(studentName,
-						classHours);
-				System.out.format("%.1f", testDouble);
-				System.out.println();
-			}
-		}
+
+		printStudents(students);
 	}
 
-	public double accumulateStudentHours(String studentNameToCheck,
-			double studentHours)
+	public static void printStudents(List<Student> students)
 	{
-		studentName = studentNameToCheck;
-		for (int i = 0; i < studentHourRecordList.size(); i++)
+		for (Student shr : students)
 		{
-			if (studentName.equals(studentHourRecordList.get(i)
-					.getStudentName())
-					&& !studentHourRecordList.get(i).isProcessed())
-			{
-				studentHours += studentHourRecordList.get(i).getClassLength();
-				studentHourRecordList.get(i).setProcessed(true);
-			}
+			System.out.println(shr.getName() + "         "
+					+ shr.getHours());
 		}
-		return studentHours;
 	}
 }
-
-// http://viralpatel.net/blogs/java-read-write-excel-file-apache-poi/
