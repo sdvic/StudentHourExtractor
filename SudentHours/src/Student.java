@@ -31,7 +31,7 @@ public class Student implements Comparable<Student>
 	@Override
 	public String toString()
 	{
-		return name + "\t" + hours;
+		return String.format("%-25s %.1f", name, hours);
 	}
 	
 	public double addTime(double time)

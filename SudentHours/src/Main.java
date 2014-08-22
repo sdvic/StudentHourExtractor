@@ -1,15 +1,15 @@
 /****************************************************************************************
  * Application to extract Student hours by name from Quick Books Invoice dump
- * Vic Wintriss version 140821A Trying to change to Erik's sort
+ * Vic Wintriss version 140821B Works perfectly with Erik's corrections
  ****************************************************************************************/
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -18,18 +18,13 @@ import org.apache.poi.ss.usermodel.Row;
 
 public class Main
 {
-	public Student student;
-	private List<Student> students = new ArrayList<Student>();
-	private String studentName = "";
-	private Cell memo;
-	private double classHours;
+	private final Map<String, Student> database = new HashMap<String, Student>();
 	private String classHoursString;
-	private int nameCell = 5;// column 5 Name
-	private int memoCell = 4;
-	private FileInputStream file;
-	private HSSFWorkbook workbook;
-	private HSSFSheet sheet;
-	private Cell name;
+	private static final int NAME_CELL = 5;// column 5 Name
+	private static final int MEMO_CELL = 4;
+	private static final Pattern MEMO_CELL_PATTERN = Pattern.compile(
+			"\\d{4} tuition - ([+-]?\\d*\\.?\\d+)\\s+hr"
+			);
 
 	public static void main(String[] args) throws IOException
 	{
@@ -38,16 +33,18 @@ public class Main
 
 	private void getGoing() throws IOException
 	{
-		file = new FileInputStream(new File(
-				"/Users/VicMini/git/StudentHour/SudentHours/src/July2014StudentHours.xls"));
-		workbook = new HSSFWorkbook(file);
-		sheet = workbook.getSheetAt(0);
+		FileInputStream file = new FileInputStream(new File(
+				"/Users/Carl/git/StudentHourExtractor/SudentHours/src/July2014StudentHours.xls"));
+		HSSFWorkbook workbook = new HSSFWorkbook(file);
+		HSSFSheet sheet = workbook.getSheetAt(0);
 		for (Row row : sheet)
 		{
-			name = row.getCell(nameCell);
-			memo = row.getCell(memoCell);
-			if (memo != null)
+			Cell name = row.getCell(NAME_CELL);
+			Cell memo = row.getCell(MEMO_CELL);
+			double classHours = 0.0;
+			if (memo != null && name != null)
 			{
+				
 				classHoursString = memo.toString();
 				if (classHoursString.contains("- 1 hr"))
 				{
@@ -65,26 +62,30 @@ public class Main
 				{
 					classHours = 10.0;
 				}
-			}
-			if (name != null)
-			{
-				studentName = name.getStringCellValue();
+
+				String studentName = name.getStringCellValue();
 				if (!studentName.equals("Name"))
 				{
-					students.add(new Student(studentName, classHours));
+					Student student = database.get(studentName);
+					if(student == null){
+						student = new Student(studentName, 0.0);
+						database.put(studentName, student);
+					}
+					student.addTime(classHours);
 				}
 			}
 		}
 
-		printStudents(students);
+		printStudents();
 	}
 
-	public static void printStudents(List<Student> students)
+	public void printStudents()
 	{
-		for (Student shr : students)
-		{
-			System.out.println(shr.getName() + "         "
-					+ shr.getHours());
+		Student[] students = new Student[database.size()];
+		students = database.values().toArray(students);
+		Arrays.sort(students);
+		for (Student s : students) {
+			System.out.println(s);
 		}
 	}
 }
