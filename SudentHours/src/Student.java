@@ -7,7 +7,6 @@ public class Student implements Comparable<Student>
 	public Student(String name)
 	{
 			this.name = name;
-			this.hours = hours;
 	}
 	public String getName()
 	{
