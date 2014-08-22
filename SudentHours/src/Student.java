@@ -4,7 +4,7 @@ public class Student implements Comparable<Student>
 	private String name;
 	private double hours;
 
-	public Student(String name, double hours)
+	public Student(String name)
 	{
 			this.name = name;
 			this.hours = hours;

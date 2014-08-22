@@ -1,6 +1,6 @@
 /****************************************************************************************
  * Application to extract Student hours by name from Quick Books Invoice dump
- * Vic Wintriss version 140821B Works perfectly with Erik's corrections
+ * Vic Wintriss version 140821D Works perfectly with Erik's corrections...minor clean up
  ****************************************************************************************/
 
 import java.io.File;
@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -21,11 +20,7 @@ public class Main
 	private final Map<String, Student> database = new HashMap<String, Student>();
 	private String classHoursString;
 	private static final int NAME_CELL = 5;// column 5 Name
-	private static final int MEMO_CELL = 4;
-	private static final Pattern MEMO_CELL_PATTERN = Pattern.compile(
-			"\\d{4} tuition - ([+-]?\\d*\\.?\\d+)\\s+hr"
-			);
-
+	private static final int MEMO_CELL = 4;// column 4 Memo
 	public static void main(String[] args) throws IOException
 	{
 		new Main().getGoing();
@@ -34,7 +29,7 @@ public class Main
 	private void getGoing() throws IOException
 	{
 		FileInputStream file = new FileInputStream(new File(
-				"/Users/Carl/git/StudentHourExtractor/SudentHours/src/July2014StudentHours.xls"));
+				"/Users/VicMini/git/StudentHourExtractora/SudentHours/src/July2014StudentHours.xls"));
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet sheet = workbook.getSheetAt(0);
 		for (Row row : sheet)
@@ -68,7 +63,7 @@ public class Main
 				{
 					Student student = database.get(studentName);
 					if(student == null){
-						student = new Student(studentName, 0.0);
+						student = new Student(studentName);
 						database.put(studentName, student);
 					}
 					student.addTime(classHours);
