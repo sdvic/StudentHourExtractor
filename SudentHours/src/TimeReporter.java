@@ -1,7 +1,7 @@
 /****************************************************************************************
  * Application to extract Student hours by name from Quick Books Invoice dump
- * Vic Wintriss version 140824A Working with report date and total Student Hours
- * Scholarship Hours????
+ * Vic Wintriss version 140901A Working with report date, total Student Hours,
+ * Scholarship Hours???? and Average Class Hours per Student
  ****************************************************************************************/
 
 import java.io.IOException;
@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -41,6 +43,10 @@ public class TimeReporter {
 	private void readStudentHours() throws IOException {
 		InputStream file = getClass().getResourceAsStream(
 				"July2014StudentHours.xls");
+		String userInput = JOptionPane
+				.showInputDialog("What is the location of your Student Record File?");
+		userInput = "July2014StudentHours.xls";
+		file = getClass().getResourceAsStream(userInput);
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet sheet = workbook.getSheetAt(0);
 		for (Row row : sheet) {
@@ -59,8 +65,7 @@ public class TimeReporter {
 				} else if (classHoursString.contains("workshop")) {
 					classHours = 10.0;
 				}
-				if(scholarshipString.contains("scholarship"))
-				{
+				if (scholarshipString.contains("scholarship")) {
 					totalMonthScholarshipHours += 10;
 				}
 
@@ -86,10 +91,14 @@ public class TimeReporter {
 		Arrays.sort(students);
 		for (Student s : students) {
 			System.out.println(s);
-			
+
 			totalMonthStudentHours += s.getHours();
 		}
-		System.out.println("\nTotal Student hours for this month " + totalMonthStudentHours);
-		System.out.println("\nTotal Scholarship hours for this month " + totalMonthScholarshipHours);
+		System.out.println("\nTotal Student hours for this month "
+				+ totalMonthStudentHours);
+		System.out.println("\nAverage Class Hours per Student for this Month "
+				+ (int)totalMonthStudentHours/database.size());
+		System.out.println("\nTotal Scholarship hours for this month "
+				+ totalMonthScholarshipHours);
 	}
 }
